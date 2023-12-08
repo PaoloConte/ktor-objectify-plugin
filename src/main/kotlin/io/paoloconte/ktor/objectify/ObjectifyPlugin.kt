@@ -16,8 +16,7 @@ val ObjectifyPlugin = createApplicationPlugin("ObjectifyPlugin") {
 
     on(CallHook()) {  _, block ->
         withContext(ObjectifyContext(factory)) {
-            val objectify = ObjectifyService.begin()
-            objectify.use {
+            ObjectifyService.begin().use {
                 block()
             }
         }
