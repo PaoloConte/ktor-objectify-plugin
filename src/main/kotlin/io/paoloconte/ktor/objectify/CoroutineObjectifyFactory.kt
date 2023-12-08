@@ -16,8 +16,8 @@ internal class CoroutineObjectifyFactory(
     memcache: MemcacheService? = null
 ): ObjectifyFactory(datastore, memcache) {
 
-    // this is private is super class so recreate it and reimplement methods
-    // alternative could be to use reflection to access the private field but performance hit
+    // this is private in super class so recreate it and reimplement methods
+    // alternative could be to use reflection to access the private field but performance would suffer
     val stacks: ThreadLocal<Deque<Objectify>> = ThreadLocal.withInitial { ArrayDeque() }
 
     override fun ofy(): Objectify {
