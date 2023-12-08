@@ -1,9 +1,6 @@
-@file:Suppress("ClassName")
-
 package io.paoloconte.ktor.objectify
 
 import com.googlecode.objectify.ObjectifyService
-import com.googlecode.objectify.ObjectifyService.ofy
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAtLeast
@@ -11,20 +8,20 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
 
 
-class `Objectify Plugin Test` : BehaviorSpec({
+class `Objectify Context Test` : BehaviorSpec({
 
     data class TestResultItem(val ofy: Int, val thread: String)
     data class TestResult(val instances: List<TestResultItem>)
 
     suspend fun task(): TestResult {
         ObjectifyService.begin().use {
-            val ofy1 = ofy().hashCode()
+            val ofy1 = ObjectifyService.ofy().hashCode()
             val thread1 = Thread.currentThread().name
             yield()
-            val ofy2 = ofy().hashCode()
+            val ofy2 = ObjectifyService.ofy().hashCode()
             val thread2 = Thread.currentThread().name
             yield()
-            val ofy3 = ofy().hashCode()
+            val ofy3 = ObjectifyService.ofy().hashCode()
             val thread3 = Thread.currentThread().name
 
             return TestResult(listOf(
