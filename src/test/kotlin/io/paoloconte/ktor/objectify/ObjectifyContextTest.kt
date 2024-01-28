@@ -1,14 +1,14 @@
 package io.paoloconte.ktor.objectify
 
 import com.googlecode.objectify.ObjectifyService
-import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAtLeast
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
 
 
-class `Objectify Context Test` : BehaviorSpec({
+class `Objectify Context Test` : StringSpec({
 
     data class TestResultItem(val ofy: Int, val thread: String)
     data class TestResult(val instances: List<TestResultItem>)
@@ -32,39 +32,38 @@ class `Objectify Context Test` : BehaviorSpec({
         }
     }
 
-    Given("a Objectify service with Coroutine Factory") {
-        When("inside a ObjectifyContext") {
-            Then("every coroutine should always get the same instance of ofy()") {
+    """
+    Given an Objectify service with Coroutine Factory
+    When requesting an Objectify instance inside a ObjectifyContext
+    Then every coroutine should always get the same instance
+    """ {
+        val factory = CoroutineObjectifyFactory()
+        ObjectifyService.init(factory)
 
-                val factory = CoroutineObjectifyFactory()
-                ObjectifyService.init(factory)
-
-                runBlocking(Dispatchers.IO) {
-                    val tasks = (0 until 100).map {
-                        async {
-                            withContext(ObjectifyContext(factory)) {
-                                task()
-                            }
-                        }
+        runBlocking(Dispatchers.IO) {
+            val tasks = (0 until 100).map {
+                async {
+                    withContext(ObjectifyContext(factory)) {
+                        task()
                     }
-                    val results = tasks.map { it.await() }
-
-                    results.size shouldBe 100
-
-                    // verify that in all cases the instance is always the same
-                    results.forAll {
-                        val first = it.instances.first().ofy
-                        it.instances.all { it.ofy == first }
-                    }
-
-                    // verify that the thread changes within the same coroutine
-                    results.forAtLeast(90) {
-                        val first = it.instances.first().thread
-                        it.instances.any { it.thread != first }
-                    }
-
                 }
+            }
+            val results = tasks.map { it.await() }
+
+            results.size shouldBe 100
+
+            // verify that in all cases the instance is always the same
+            results.forAll {
+                val first = it.instances.first().ofy
+                it.instances.all { it.ofy == first }
+            }
+
+            // verify that the thread changes within the same coroutine
+            results.forAtLeast(90) {
+                val first = it.instances.first().thread
+                it.instances.any { it.thread != first }
             }
         }
     }
+
 })
