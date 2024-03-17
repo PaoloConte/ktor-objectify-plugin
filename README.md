@@ -2,7 +2,11 @@
 The Objectify library is not compatible with coroutines, as it relies on Thread locals to manage its state. For this reason, the ObjectifyFilter (or similar approaches) can't be used with Ktor.  This plugin provides the necessary glue code to make Objectify work with coroutines in Ktor.
 
 # Usage
-
+```kotlin
+dependencies {
+    implementation("io.paoloconte:ktor-objectify:1.0")
+}
+```
 ```kotlin
 fun Application.module() {
     install(ObjectifyPlugin)
