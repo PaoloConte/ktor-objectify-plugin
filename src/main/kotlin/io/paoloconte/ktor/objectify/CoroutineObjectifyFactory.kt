@@ -24,7 +24,7 @@ internal class CoroutineObjectifyFactory(
         val stack = stacks.get()
 
         check(!stack.isEmpty()) {
-            "Objectify context not started!?!."
+            "Objectify context not started!?!"
         }
 
         return stack.last
